@@ -1,19 +1,14 @@
 <?php
-// ============================================================
-// auth.php - Session checker + Security
-// ============================================================
 
+session_name('dcms_admin');
 if (session_status() === PHP_SESSION_NONE) {
-    // Secure session settings
-    ini_set('session.cookie_httponly', 1);    // JS cannot access session cookie
-    ini_set('session.use_strict_mode', 1);    // Reject uninitialized session IDs
+    ini_set('session.cookie_httponly', 1);
+    ini_set('session.use_strict_mode', 1);
     ini_set('session.cookie_samesite', 'Strict');
     session_start();
 }
 
-// ============================================================
-// SESSION TIMEOUT — log out after 8 hours of inactivity
-// ============================================================
+
 if (isset($_SESSION['last_activity'])) {
     if (time() - $_SESSION['last_activity'] > SESSION_LIFETIME) {
         session_unset();
@@ -24,9 +19,7 @@ if (isset($_SESSION['last_activity'])) {
 }
 $_SESSION['last_activity'] = time();
 
-// ============================================================
-// Redirect to login if not logged in
-// ============================================================
+
 if (!isset($_SESSION['user_id'])) {
     header('Location: ' . BASE_URL . 'index.php');
     exit();
@@ -36,10 +29,7 @@ $current_user_id   = $_SESSION['user_id'];
 $current_user_name = $_SESSION['full_name'];
 $current_user_role = $_SESSION['role'];
 
-// ============================================================
-// SESSION FIXATION PROTECTION
-// Regenerate session ID periodically (every 30 minutes)
-// ============================================================
+
 if (!isset($_SESSION['created_at'])) {
     $_SESSION['created_at'] = time();
 } elseif (time() - $_SESSION['created_at'] > 1800) {
